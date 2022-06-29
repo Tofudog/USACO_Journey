@@ -2,7 +2,6 @@
 #include <algorithm>
 using namespace std;
 
-
 /*
 Originally, I knew A and B were idx 0 and 1 sorted respectively,
 but did not realize element 6 was A+B+C. Here is my o.g. solution
