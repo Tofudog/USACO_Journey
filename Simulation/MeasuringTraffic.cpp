@@ -1,65 +1,56 @@
 #include <iostream>
 #include <cstdio>
-#include <vector>
 using namespace std;
-
-// int* close_range(int arr[2], int low, int high) {
-//     int nlow = max(low, arr[0]);
-//     int nhigh = min(high, arr[1]);
-//     return new int[2]{nlow, nhigh};
-// }
+typedef pair<int, int> ppi;
 
 int main() {
-    // freopen("traffic.in", "r", stdin);
-    // freopen("traffic.out", "w", stdout);
-    int N;
-    cin >> N;
-    vector<string> ramps;
-    vector<int> low, high;
+    freopen("traffic.in", "r", stdin);
+    freopen("traffic.out", "w", stdout);
+    int N; cin >> N;
+    int traffic[N][3];
     for (int i=0; i<N; i++) {
-        string R;
-        int L, H;
-        cin >> R >> L >> H;
-        ramps.push_back(R);
-        low.push_back(L);
-        high.push_back(H);
+        string ramp;
+        int low; int high;
+        cin >> ramp >> low >> high;
+        if (ramp=="none") {traffic[i][0]=0;}
+        else if (ramp=="on") {traffic[i][0]=1;}
+        else {traffic[i][0]=2;}
+        traffic[i][1] = low; traffic[i][2] = high;
     }
-    int before[2] = {-1, -1};
-    int after[2] = {-1, -1};
-    int on_add[2] = {0, 0};
-    int off_sub[2] = {0, 0};
-    // for 'before', we use current and previous on/off values to calculate range until last segment w/o a ramp
-    // for 'after', we neglect on/off until reaching first segment w/o a ramp.
-    for (int seg=0; seg<N; seg++) {
-        if (ramps[seg].compare("on") == 0) {
-            on_add[0] += low[seg];
-            on_add[1] += high[seg];
+    //before mile 1 solution
+    int startidx=0; int endidx=N-1;
+    while (traffic[startidx][0]!=0) {startidx++;}
+    while (traffic[endidx][0]!=0) {endidx--;}
+    ppi before = {traffic[startidx][1], traffic[startidx][2]};
+    ppi after = {traffic[endidx][1], traffic[endidx][2]};
+    for (int i=startidx+1; i<N; i++) {
+        if (traffic[i][0]==0) {
+            before.first = max(before.first, traffic[i][1]);
+            before.second = min(before.second, traffic[i][2]);
         }
-        else if (ramps[seg].compare("off") == 0) {
-            off_sub[0] += low[seg];
-            off_sub[1] += high[seg];
+        else if (traffic[i][0]==1) {
+            before.first += traffic[i][1];
+            before.second += traffic[i][2];
         }
         else {
-            if (after[0]==-1) {
-                after[0] = low[seg];
-                after[1] = high[seg];
-                // subject to error.
-                before[0] = low[seg]-off_sub[0]+on_add[0];
-                before[1] = high[seg]-off_sub[1]+on_add[1];
-            }
-            else {
-                after[0] = max(after[0], low[seg]);
-                after[1] = min(after[1], high[seg]);
-                before[0] = max(before[0], low[seg]);
-                before[1] = min(before[1], high[seg]);
-            }
+            before.first = max(0, before.first-traffic[i][2]);
+            before.second = max(0, before.second-traffic[i][1]);
         }
     }
-    after[0] += (on_add[0] - off_sub[0]);
-    after[1] += (on_add[1] - off_sub[1]);
-
-    cout << before[0] << ' ' << before[1] << '\n';
-    cout << after[0] << ' ' << after[1] << '\n';
-
-    return 0;
+    //after mile N solution
+    for (int i=endidx-1; i>=0; i--) {
+        if (traffic[i][0]==0) {
+            after.first = max(after.first, traffic[i][1]);
+            after.second = min(after.second, traffic[i][2]);
+        }
+        else if (traffic[i][0]==1) {
+            after.first = max(0, after.first-traffic[i][2]);
+            after.second = max(0, after.second-traffic[i][1]);
+        }
+        else {
+            after.first += traffic[i][1];
+            after.second += traffic[i][2];
+        }
+    }
+    cout << after.first << ' ' << after.second << '\n' << before.first << ' ' << before.second << '\n';
 }
