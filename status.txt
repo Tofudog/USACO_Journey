@@ -1,0 +1,6 @@
+Problems to be solved:
+
+* Simulation
+	->Milk Measurement
+	->Stuck in a Rut
+	->Censoring (works on guide, but not test case 15 of web)
