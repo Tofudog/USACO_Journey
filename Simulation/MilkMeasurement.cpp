@@ -1,39 +1,51 @@
 #include <iostream>
-#include <cstdio>
 #include <map>
 using namespace std;
-typedef pair<int, int> ppi;
 
-//at most, there are 100 days.
-//time complexity being linear at O(2N), at most 200 iterations occur, which should be OK
+//time taken: 2h 24m 26s
+/* Thing I wish I knew:
+    ***if a cow drops lead or gains lead, no matter
+        if there is a tie or not, score increments.
+        I thought two or more cows yields the same score!
+        But now this works. Difficulty: Hard.
+*/
 int main() {
-    // freopen("measurement.in", "r", stdin);
-    // freopen("measurement.out", "w", stdout);
-    int N; cin >> N;
-    map<int, ppi> measurements;
-    int days[N];
-    for (int i=0; i<N; i++) {
-        int day, change; string cow;
-        cin >> day >> cow >> change;
-        days[i]=day;
-        if (cow=="Bessie") {measurements[day] = {0, change};}
-        else if (cow=="Elsie") {measurements[day] = {1, change};}
-        else {measurements[day] = {2, change};}
+    freopen("measurement.in", "r", stdin);
+    freopen("measurement.out", "w", stdout);
+    int n; cin >> n;
+    map<int, int> days;
+    int change[101]; int scores[3] = {7, 7, 7};
+    bool tie = true; int high = 7; //int hi = -1;
+    for (int i=0; i<n; i++) {
+        int d, c; string n; cin >> d >> n >> c;
+        if (n=="Bessie") {days[d] = 0;}
+        else if (n=="Elsie") {days[d] = 1;}
+        else {days[d] = 2;}
+        change[d] = c;
     }
-    //consider: how to check if multiple ties for first
-    int amt=0; int ties=3; int prev=0; int scores[3] = {7, 7, 7};
-    for (int day : days) {
-        ppi attr = measurements[day];
-        if (scores[attr.first]+attr.second > max(scores[0], max(scores[1], scores[2])) ) {
-            if (attr.first!=prev) {prev=attr.first; amt++;}
-        }
-        if (scores[attr.first]+attr.second == max(scores[0], max(scores[1], scores[2])) ) {
-            if ( scores[(attr.first+1)%3] != scores[(attr.first+2)%3] ) {amt++;}
+    int ans = 0;
+    bool bOn = true; bool eOn = true; bool mOn = true;
+    bool bOnNext = true; bool eOnNext = true; bool mOnNext = true;
+    for (const auto &cow : days) {
+        scores[cow.second] += change[cow.first];
+        high = max( scores[0], max(scores[1], scores[2]) );
+        bOnNext = (scores[0] >= high);
+        eOnNext = (scores[1] >= high);
+        mOnNext = (scores[2] >= high);
+        if (bOnNext + eOnNext + mOnNext > 1) {tie = true;}
+        if (tie) {
+            if (bOn==bOnNext && eOn==eOnNext && mOn==mOnNext) {}
+            else if (bOnNext + mOnNext + eOnNext == 1) {
+                ans++; tie = false;
+            }
+            else {ans++;}
         }
         else {
-            if ( scores[(attr.first+1)%3] != scores[(attr.first+2)%3] ) {amt++;}
+            if ((bOn||bOnNext) + (eOn||eOnNext) + (mOn||mOnNext) > 1) {
+                ans++;
+            }
         }
-        scores[attr.first]+=attr.second;
+        bOn = bOnNext; eOn = eOnNext; mOn = mOnNext;
     }
-    cout << amt;
+    cout << ans << '\n';
 }
