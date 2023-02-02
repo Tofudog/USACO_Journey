@@ -1,11 +1,11 @@
-# USACO_Journey
+# USACO_Journey (Silver)
 My journey in USACO (readme will be updated...)
 
-Advanced Tricks:
+###Advanced Tricks:
 
-* typedef <classname/object/ds> newName;
-  -> typedef pair<int, int> ppi;
-  -> typedef long long ll;
+####* typedef <classname/object/ds> newName;
+####  -> typedef pair<int, int> ppi;
+####  -> typedef long long ll;
   
 * freopen("problemname.in", "r", stdin); freopen("problemname.out", "w", stdout);
 
